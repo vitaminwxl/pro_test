@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block self_head_css_js %}
+  <title>用户管理</title>
+
+  <!--data table-->
+  <link rel="stylesheet" href="/static/js/data-tables/DT_bootstrap.css" />
+  <link rel="stylesheet" href="/static/sweetalert/sweetalert.css"/>
+{% endblock %}
+
+{% block  content %}
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <h3>
+                线路管理
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/">首页</a>
+                </li>
+                <li>
+                    <a href="/dns/domain_show">域名管理</a>
+                </li>
+                <li class="active"> 线路管理 </li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                <section class="panel">
+                <header class="panel-heading">
+                    <b>线路管理</b>
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                     <div class="adv-table editable-table ">
+                        <div class="clearfix">
+                            <div class="btn-group">
+                                <button id="editable-sample_new" class="btn btn-primary" onclick="AddRecord();">
+                                    <a href="{% url 'view_add' %}">添加线路 <i class="fa fa-plus"></i></a>
+                                </button>
+                            </div>
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a href="#">Print</a></li>
+                                    <li><a href="#">Save as PDF</a></li>
+                                    <li><a href="#">Export to Excel</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                         <div class="space15" style="padding: 20px 20px"></div>
+                         <table class="table table-striped table-hover table-bordered" id="editable-sample" >
+                            <thead>
+                                <tr>
+                                    <th class="text-center">选择</th>
+                                    <th class="text-center">线路</th>
+                                    <th class="text-center">操作</th>
+                                </tr>
+                            </thead>
+                             <tbody >
+                             {% for region in Region_obj %}
+                                <tr>
+                                    <td class="text-center" width="5%" nowrap="nowrap">
+                                        <input type="checkbox" value="{{ region.pkgit }}">
+                                    </td>
+                                    <td class="text-center">{{ region.name }}</td>
+                                     <td class="text-center">
+                                        <a id='record-id' type="button" class="preview btn btn-danger" onclick="DeleteView('{% url 'view_delete' region.pk %}')">删除</a>
+                                        <a id='record-id' type="button" class="preview btn btn-warning" onclick="SyncRecord('{% url 'sync_view' region.pk %}')">同步</a>
+                                    </td>
+                                </tr>
+                             {% endfor %}
+                             </tbody>
+
+                         </table>
+                </div>
+                </section>
+                </div>
+            </div>
+        </div>
+
+        <!--body wrapper end-->
+{% endblock %}
+
+{% block self_footer_js %}
+<script type="text/javascript" src="/static/sweetalert/sweetalert.min.js"></script>
+
+<script>
+
+
+function DeleteView(url_path){
+    swal({
+        title: "删除线路",
+        text: "删除线路同时会将该线路下所有记录及域名删除，确定要删除吗?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "是的,我要删除",
+        closeOnConfirm: false
+    }, function(){
+        $.ajax({
+            type: 'GET',
+            url: url_path,
+            success: function(callback){
+                var callback = $.parseJSON(callback);
+                if(callback.status){
+                    window.location.reload();
+                }else{
+                    swal("删除失败", callback.error, "error");
+                }
+            }
+        })
+
+    });
+}
+
+function SyncRecord(url_path){
+    swal({
+        title:'同步记录',
+        text: "将同步当前线路所有记录到配置文件,确定要同步吗?",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "是的,同步",
+        closeOnConfirm: false
+    },function(){
+        $.get(url_path,function(result){
+            var result = $.parseJSON(result);
+            if(result.status){
+                swal("同步成功","success");
+                $('.info').html('同步成功')
+            }
+            else{
+                swal("同步失败", result.error, "error");
+            }
+        })
+      }
+    )}
+</script>
+
+{% endblock %}

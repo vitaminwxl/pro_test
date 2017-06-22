@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="#" type="image/png">
+
+  <title>Meixin DNS</title>
+  {% include 'link_css.html' %}
+  {% block self_head_css_js %} {% endblock %}
+</head>
+
+<body class="sticky-header">
+
+<section>
+    <!-- left side start-->
+    <div class="left-side sticky-left-side">
+		{% include 'logo.html' %}
+        <div class="left-side-inner">
+			{% include 'nav.html' %}
+        </div>
+    </div>
+    <!-- left side end-->
+    
+    <!-- main content start-->
+    <div class="main-content" >
+        <div class="header-section">
+        <a class="toggle-btn"><i class="fa fa-bars"></i></a>
+		{% include 'nav_header.html' %}     
+        </div>
+		{% block content %} {% endblock %}
+		{% include 'footer.html' %}
+    </div>
+</section>
+
+</body>
+	{% include 'foot_script.html' %}
+<script>
+   $(function(){
+       var url_array = document.location.pathname.split("/");
+    s1 = url_array[1];
+    s2 = url_array[2];
+    if (s1 == ''){
+        $('#index').addClass('active')
+    } else {
+        $("#"+s1).addClass('nav-active');
+        $('#'+s1+' .'+s2).addClass('active');
+        console.log(s1)
+    }
+
+   })
+</script>
+	{% block self_footer_js %} {% endblock %}
+</html>

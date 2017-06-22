@@ -1,0 +1,7 @@
+{% for domain in domains %}
+zone "{{ domain }}" IN {
+        type slave;
+        file "{{ view_dir }}/{{ domain }}.zone";
+        masters { 10.69.112.125; };
+};
+{% endfor %}

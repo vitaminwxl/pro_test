@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <style>
+        .hide{
+            display: none;
+        }
+        /* 遮罩层 */
+        .shade{
+            position:fixed;
+            z-index:1040;
+            top:0;left:0;right:0;bottom:0;
+            background-color:#999;filter:alpha(opacity=50); -moz-opacity:0.5;opacity:0.5;
+        }
+        /* 模态对话框 */
+        .motai{
+            position: fixed;
+            z-index: 1050;
+            width: 400px;
+            height: 260px;
+            background-color: beige;
+            top:50%;
+            left:50%;
+            margin-left: -200px;
+            margin-top: -200px;
+        }
+    </style>
+    <!--data table-->
+  <link rel="stylesheet" href="/static/js/data-tables/DT_bootstrap.css" />
+    <!--添加域名模态对话框-->
+
+{% endblock %}
+
+
+{% block content %}
+        <div class="page-heading">
+            <h3>
+                域名解析
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">域名解析</a>
+                </li>
+                <li class="active">  </li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+             <div class="row">
+                <div class="col-sm-12">
+                <section class="panel">
+                <header class="panel-heading">
+                    操作记录
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                <div class="adv-table editable-table ">
+                <div class="clearfix">
+                    <div class="btn-group">
+                        <button id="editable-sample_new" class="btn btn-primary" onclick="AddRecord();">
+                            添加记录 <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a href="#">Print</a></li>
+                            <li><a href="#">Save as PDF</a></li>
+                            <li><a href="#">Export to Excel</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="space15"></div>
+                <div style="padding: 20px 0px">
+                    <input type="button" class="btn btn-success" onclick="CheckAll('#edit_mode', '#tb1');" value="全选" />
+                    <input type="button" class="edit btn btn-info"onclick="CheckReverse('#edit_mode', '#tb1');" value="反选" />
+                    <input type="button" class="btn btn-warning"onclick="CheckCancel('#edit_mode', '#tb1');" value="取消" />
+                    <input type="button" class="btn btn-warning"onclick="CheckSave('#edit_mode', '#tb1');" value="保存" />
+
+                    <a id="edit_mode" class="edit-mode" href="javascript:void(0);"  onclick="EditMode(this, '#tb1');">进入编辑模式</a>
+
+                </div>
+                <table class="table table-striped table-hover table-bordered" id="editable-sample">
+                    <thead>
+                    <tr>
+                        <th class="text-center">选择</th>
+                        <th class="text-center">主机记录</th>
+                        <th class="text-center">记录类型</th>
+                        <th class="text-center">线路类型</th>
+                        <th class="text-center">记录值</th>
+                        <th class="text-center">权重</th>
+                        <th class="text-center">MX优先级</th>
+                        <th class="text-center">TTL</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tb1">
+                    <tr >
+                        <td class="text-center">
+                            <input  value="1" type="checkbox"/>
+                        </td>
+                        <td class="text-center" edit="true" name="entry_name">www</td>
+                        <td class="text-center" edit="true" sel-val='2' edit-type="select" name="entry_type">CNAME</td>
+                        <td class="text-center" edit="true" name="entry_line" sel-val='1' edit-type="select">默认</td>
+                        <td class="text-center" edit="true" name="entry_value">wangyichen.com</td>
+                        <td class="text-center" edit="true" name="entry_weight">-</td>
+                        <td class="text-center" edit="true" name="entry_mx">-</td>
+                        <td class="center" edit="true" name="entry_ttl">600</td>
+                        <td class="text-center">
+                            <!--<a id='record-id' href="javascript:;" class="Edit btn btn-default" onclick="EditRow(this)">Edit</a>-->
+{#                            <a id='record-id' type="button" class="edit btn btn-success" onclick="EditRow(this)">Edit</a>#}
+{#                            <a id='record-id' type="button" class="save btn btn-info" onclick="SaveTable(this)">Save</a>#}
+                            <a id='record-id' type="button" class="delete btn btn-danger">delete</a>
+                            <a id='record-id' type="button" class="preview btn btn-warning">Preview</a>
+                        </td>
+                    </tr>
+                    <tr >
+                        <td class="text-center">
+                            <input value="2" type="checkbox"/>
+                        </td>
+                        <td class="text-center" edit="true" name="entry_name">www</td>
+                        <td class="text-center" edit="true" sel-val='2'edit-type="select" name="entry_type">CNAME</td>
+                        <td class="text-center" edit="true" name="entry_line" sel-val='2' edit-type="select">四川</td>
+                        <td class="text-center" edit="true" name="entry_value">wangyichen.com</td>
+                        <td class="text-center" edit="true" name="entry_weight">-</td>
+                        <td class="text-center" edit="true" name="entry_mx">-</td>
+                        <td class="center" edit="true" name="entry_ttl">600</td>
+                        <td class="text-center">
+                            <!--<a id='record-id' href="javascript:;" class="Edit btn btn-default" onclick="EditRow(this)">Edit</a>-->
+{#                            <a id='record-id' type="button" class="edit btn btn-success" onclick="EditRow(this)">Edit</a>#}
+{#                            <a id='record-id' type="button" class="save1 btn btn-info">Save</a>#}
+                            <a id='record-id' type="button" class="delete btn btn-danger">delete</a>
+                            <a id='record-id' type="button" class="preview btn btn-warning">Preview</a>
+                        </td>
+                    </tr>
+
+                     </tbody>
+                </table>
+                </div>
+                </div>
+                </section>
+                </div>
+                </div>
+        </div>
+    <!--body wrapper end-->
+    <!-- 模态对话框开始 -->
+    <div id="modal" class="motai hide ">
+        <div class="hide">ID：<input id="nid" name="nid" /></div>
+        <div>主机记录：<input type="text" id="entry_name" name="entry_name" /></div>
+        <div>记录类型:
+            <select id="entry_type" name="entry_type">
+                <option>A</option>
+                <option selected="selected">CNAME</option>
+                <option>NS</option>
+                <option>AAAA</option>
+                <option>显性URL</option>
+                <option>隐形URL</option>
+            </select>
+        </div>
+        <div>线路类型：
+            <select id="entry_line" name="entry_line">
+                <option selected="selected">默认</option>
+                <option>四川</option></select>
+        </div>
+        <div>记录值：<input type="text" id="entry_value" name="entry_value" /></div>
+        <div>权重: <input type="text" id="entry_weight" name="entry_weight" /></div>
+        <div>MX优先级：<input type="text" id="entry_mx" name="entry_mx" /></div>
+        <div>TTL：<input type="text" id="entry_ttl" name="entry_ttl" /></div>
+
+
+
+
+
+        <div>
+            <input type="button" value="取消" onclick="CancleModal();" />
+            <input type="button" value="确定" onclick="SubmitModal();"/>
+        </div>
+    </div>
+    <!-- 模态对话框结束 -->
+
+    <!-- 遮罩层开始 -->
+    <div id='shade' class='shade hide'></div>
+    <!-- 遮罩层结束 -->
+{% endblock %}
+
+
+
+{% block self_footer_js %}
+
+
+
+<!--data table-->
+<script type="text/javascript" src="/static/js/data-tables/jquery.dataTables.js"></script>
+<script type="text/javascript" src="/static/js/data-tables/DT_bootstrap.js"></script>
+
+
+<!--script for editable table-->
+<script src="/static/js/data-tables/editable-table.js"></script>
+
+<!-- END JAVASCRIPTS -->
+<script>
+
+/*
+添加记录
+ */
+
+function AddRecord(){
+    $('#modal,#shade').removeClass('hide');
+
+}
+
+/*
+添加记录-->取消
+ */
+function CancleModal(){
+    $('#modal,#shade').addClass('hide');
+    $('#modal').find('input[type="text"]').val('');
+}
+
+
+/*
+添加内容-->提交
+ */
+$.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+function SubmitModal(){
+    // 获取对话框中的所有内容
+//          var modal_nid = $('#nid').val();
+    var entry_name = $('#entry_name').val();
+    var entry_type = $('#entry_type').val();
+    var entry_line = $('#entry_line').val();
+    var entry_value = $('#entry_value').val();
+    var entry_mx = $('#entry_mx').val();
+    var entry_weight = $('#entry_weight').val();
+    var entry_ttl = $('#entry_ttl').val();
+
+    $.ajax({
+        url: '{% url 'resolve_add' %}',
+        data:
+            {
+                'entry_name' : entry_name,
+                'entry_type' : entry_type,
+                'entry_value': entry_value,
+                'entry_line' : entry_line,
+                'entry_mx'   : entry_mx,
+                'entry_weight' : entry_weight,
+                'entry_ttl'  : entry_ttl
+            },
+        type: "POST",
+        success: function (callback) {
+            callback = $.parseJSON(callback);
+            if(callback.status){
+                // 刷新当前页
+                alert('添加成功')
+                window.location.href = window.location.href;
+            }else{
+                alert(callback.error);
+                $('#modal,#shade').addClass('hide');
+            }
+        }
+    });
+}
+
+
+
+/*    jQuery(document).ready(function() {
+        EditableTable.init();
+    });*/
+    //编辑当前行;
+//行编辑;
+EntryType = [
+    {'id':1,value:'A'},
+    {'id':2,value:'CNAME'},
+    {'id':3,value:'NS'},
+    {'id':4,value:'AAAA'},
+    {'id':5,value:'显性URL'},
+    {'id':5,value:'隐形URL'}
+]
+EntryLine = [
+    {'id':1,value:'默认'},
+    {'id':2,value:'四川'}
+]
+var htmlInfo = {} //根据record_id来记录每个tr编辑前的html内容;
+    function EditRow(arg){
+        //获取当前行标签上面所有数据;
+        //循环所有标签,看哪些行能够编辑
+        var recordId = $(arg).parent().prevAll().find(':checkbox').parent().attr('value');
+        if (htmlInfo.hasOwnProperty(recordId)){
+        }else {
+            htmlInfo[recordId] = $('.edit').parent().parent().html();
+        }
+
+        console.log(htmlInfo)
+        if ($(arg).hasClass('editing')){
+            //取消编辑状态;
+             $(arg).text('编辑')
+            $(arg).parent().parent().html(htmlInfo[recordId])
+            $(arg).removeClass('editing');
+
+        }else{
+            $(arg).addClass('editing');
+             $(arg).text('取消');
+            var items = $(arg).parent().prevAll();
+            items.each(function(){
+                var td = $(this);
+                if (td.attr('edit') == 'true'){
+                    //如果可编辑,则进入编辑模式;
+
+                    if (td.attr('edit_type') =='select'){
+                        //如果标签是select;
+                        var temp = "<select type='entry-type'><option value='1'>A</option><option value='2'>CNAME</option></select>";
+                        td.html(temp)
+                    }else {
+                        var text = td.text();
+                        var temp = "<input type='text' value='" + text + "'/>";
+                        td.html(temp);
+                    }
+                }
+            })
+        }
+    }
+//Save
+function SaveTable(ths){
+    //1.判断是否处于编辑模式
+    //编辑模式:获取input的值
+    //非编辑模式,直接获取text值
+    var recordId = $(ths).parent().prevAll().find(':checkbox').parent().attr('value');
+    var data = {};
+    var isEditing = $(ths).siblings().eq(0).hasClass('editing')
+    if (isEditing){
+        //编辑状态中,获取input和select的值;
+        var item = $(ths).parent().prevAll();
+        item.each(function(){
+            var td = $(this);
+            if (td.attr('edit') == 'true'){
+                if (td.attr('edit_type') == 'select') {
+                    //获取select值
+                    var select_value = item.parent().prevAll().find("select[type='entry-type']").val();
+                    var select_text = (function(info){
+                        //获取select对应的值
+                        for (var item of info){
+                            if (item['id'] == select_value){
+                                var result = item['value']
+                                return result
+                            }
+                        }
+                    })(EntryType);
+                    data[td.attr('name')]=select_value;
+                    td.html(select_text);
+                    alert(td.text())
+                    alert(td.html())
+
+                }else{
+                //获取input值
+
+                     var inp = td.children(':first');
+                     var input_value = inp.val();
+                     console.log(td.text())
+                     alert(td.text())
+                     td.text(input_value);
+
+
+
+                }
+            }
+        })
+
+    }else{
+        var tr = $(ths).parent().prevAll();
+        tr.each(function(){
+        var td = $(this);
+        if (td.attr('edit') == 'true'){
+            data[td.attr('name')]=td.text();
+        }
+    })
+    console.log(data)
+}
+}
+
+
+
+
+
+
+
+
+</script>
+{% endblock %}
+
+
+
+
+
+

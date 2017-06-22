@@ -1,0 +1,20 @@
+$TTL 86400
+@  IN  SOA  {{ soa_dict.primary }}  {{ soa_dict.contact }} (
+       {{ soa_dict.serial }}
+       {{ soa_dict.expire }}
+       {{ soa_dict.retry}}
+       {{ soa_dict.refresh }}
+       {{ soa_dict.minimum }}
+)
+{% for ns in ns_list %}
+{{ ns.sub_domain }}  {{ ns.ttl }}  IN  NS  {{ ns.value }}
+{% endfor %}
+{% for mx in mx_list %}
+{{ mx.sub_domain }}  {{ mx.ttl }}  IN  MX  {{ mx.mx_priority }} {{ mx.value }}
+{% endfor %}
+{% for a in a_list %}
+{{ a.sub_domain }}  {{ a.ttl }}  IN  A  {{ a.value }}
+{% endfor %}
+{% for cname in cname_list %}
+{{ cname.sub_domain }}  {{ cname.ttl }}  IN  CNAME  {{ cname.value }}
+{% endfor %}

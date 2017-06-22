@@ -1,0 +1,6 @@
+{% for domain in domains %}
+zone "{{ domain }}" IN {
+        type master;
+        file "{{ view_dir }}/{{ domain }}.zone";
+};
+{% endfor %}

@@ -1,0 +1,28 @@
+
+
+<!--notification menu start -->
+<div class="menu-right">
+	<ul class="notification-menu">
+	
+		<li>
+			<a href='#' class="btn popovers" data-trigger="hover" data-placement="bottom" data-content="详细说明" data-original-title="使用说明">帮助&nbsp;</a>
+		</li>
+		<li>
+			<a href='#' class="btn">问题反馈&nbsp;</a>
+		</li>
+		<li>
+			<a href="#" class="btn" data-toggle="dropdown">
+				{{ request.user.username }}
+				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu dropdown-menu-usermenu pull-right">
+				<li><a href="#"><i class="fa fa-user"></i>  Profile</a></li>
+				<li><a href="#"><i class="fa fa-cog"></i>  Settings</a></li>
+				<li><a href="/logout"><i class="fa fa-sign-out"></i> Log Out</a></li>
+			</ul>
+		</li>
+
+	</ul>
+</div>
+<!--notification menu end -->
+

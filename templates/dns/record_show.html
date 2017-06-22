@@ -1,0 +1,776 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <style>
+        .hide{
+            display: none;
+        }
+        /* 遮罩层 */
+        .shade{
+            position:fixed;
+            z-index:1040;
+            top:0;left:0;right:0;bottom:0;
+            background-color:#999;filter:alpha(opacity=50); -moz-opacity:0.5;opacity:0.5;
+        }
+        /* 模态对话框 */
+        .motai{
+            position: fixed;
+            z-index: 1050;
+            width: 400px;
+            height: 260px;
+            background-color: beige;
+            top:50%;
+            left:50%;
+            margin-left: -200px;
+            margin-top: -200px;
+        }
+    </style>
+    <!--data table-->
+  <link rel="stylesheet" href="/static/js/data-tables/DT_bootstrap.css" />
+  <link rel="stylesheet" href="/static/css/bootstrapValidator.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/sweetalert/sweetalert.css">
+    <!--添加域名模态对话框-->
+
+{% endblock %}
+
+
+{% block content %}
+        <div class="page-heading">
+            <h3>
+                域名解析
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">域名解析</a>
+                </li>
+                <li class="active">  </li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+             <div class="row">
+                <div class="col-sm-12">
+                <section class="panel">
+                <header class="panel-heading">
+                    {{ domain_obj.name }}
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                <div class="adv-table editable-table ">
+                <div class="clearfix">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" data-toggle="modal"
+   data-target="#myModal";">
+                            添加记录 <i class="fa fa-plus"></i>
+                        </button>
+                        <button class="btn btn-primary" id="sync_record" style="margin-left: 10px"">
+                            同步文件
+                        </button>
+                        <ul class="btn btn-primary" style="margin-left: 10px">
+                            <li class="dropdown all-camera-dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    预览
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {% for line in lines %}
+                                    <li data-filter-camera-type="all"><a data-toggle="tab" onclick="Prev('{{ domain_obj.name }}','{{ line.name }}')" href="#">{{ line.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--<div class="alert alert-warning text-center">同步错误,请查看日志</div>-->
+                    <div class="btn-group pull-right">
+                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a href="#">Print</a></li>
+                            <li><a href="#">Save as PDF</a></li>
+                            <li><a href="#">Export to Excel</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="space15"></div>
+<!--                <div style="padding: 20px 0px">
+                    <input type="button" class="btn btn-success" onclick="CheckAll('#edit_mode', '#tb1');" value="全选" />
+                    <input type="button" class="edit btn btn-info"onclick="CheckReverse('#edit_mode', '#tb1');" value="反选" />
+                    <input type="button" class="btn btn-warning"onclick="CheckCancel('#edit_mode', '#tb1');" value="取消" />
+                    <input type="button" class="btn btn-warning"onclick="CheckSave('#edit_mode', '#tb1');" value="保存" />
+
+                    <a id="edit_mode" class="edit-mode" href="javascript:void(0);"  onclick="EditMode(this, '#tb1');">进入编辑模式</a>
+
+                </div>-->
+                <table class="table table-striped table-hover table-bordered" id="editable-sample">
+                    <thead>
+                    <tr>
+                        <th class="text-center">选择</th>
+                        <th class="text-center">更新时间</th>
+                        <th class="text-center">主机记录</th>
+                        <th class="text-center">记录类型</th>
+                        <th class="text-center">线路类型</th>
+                        <th class="text-center">记录值</th>
+                        <th class="text-center">权重</th>
+                        <th class="text-center">MX优先级</th>
+                        <th class="text-center">TTL</th>
+                        <th class="text-center">操作人</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tb1">
+                    {% for record in records %}
+                    <tr >
+                        <td class="text-center">
+                            <input value="{{ record.pk }}" type="checkbox"/>
+                        </td>
+                        <td class="text-center" edit="true" name="entry_time">{{ record.update_time | date:"Y-m-d H:i:s" }}</td>
+                        <td class="text-center" edit="true" name="entry_name">{{ record.sub_domain }}</td>
+                        <td class="text-center" edit="true" set-val='{{ record.record_type_id }}'edit-type="select" name="entry_type">{{ record.record_type.name }}</td>
+                        <td class="text-center" edit="true" name="entry_line" set-val='{{ record.region_id }}' edit-type="select">{{ record.region.name }}</td>
+                        <td class="text-center" edit="true" name="entry_value">{{ record.value }}</td>
+                        <td class="text-center" edit="true" name="entry_weight">{{ record.weight | default:'-'}}</td>
+                        <td class="text-center" edit="true" name="entry_mx">{{ record.mx_priority | default:'-'}}</td>
+                        <td class="center" edit="true" name="entry_ttl">{{ record.ttl }}</td>
+                        <td class="center" edit="true" name="entry_operator">{{ record.operator }}</td>
+                        <td class="text-center">
+                            <!--<a id='record-id' href="javascript:;" class="Edit btn btn-default" onclick="EditRow(this)">Edit</a>-->
+{#                            <a id='record-id' type="button" class="edit btn btn-success" onclick="EditRow(this)">Edit</a>#}
+{#                            <a id='record-id' type="button" class="save1 btn btn-info">Save</a>#}
+                            <a id='record-id' type="button" class="btn btn-danger" onclick="DelRecord('{{ record.pk }}')">删除</a>
+                            <a id='record-id' type="button" class="btn btn-warning" data-toggle="modal" data-target="#EditModal" onclick="ChangeData(this,'{{ record.pk }}')">编辑</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                     </tbody>
+                </table>
+                </div>
+                </div>
+                </section>
+                </div>
+                </div>
+        </div>
+<!--添加域名记录-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+   aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                    <h4 class="modal-title">添加记录</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>主机记录</label>
+                        <input type="text" class="form-control tooltips" id="entry_name" name="entry_name" data-original-title="主机记录:NS-->>填@或者填gomeplus.com.,A-->填www或者填www.gomeplus.com.,MX-->填@或者填gomeplus.com.,CNAME-->填www或者填www.gomeplus.com.">
+                    </div>
+                    <div class="form-group">
+                        <label>记录类型</label>
+                        <select class="form-control" id="entry_type" name="entry_type">
+                             {% for type in types %}
+                                 {% if type.name == 'A' %}
+                                    <option value="{{ type.pk }}" selected="selected">{{ type.name }}</option>
+                                 {% else %}
+                                 <option value="{{ type.pk }}">{{ type.name }}</option>
+                                 {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>线路类型</label>
+                         <select class="form-control tooltips" id="entry_line" name="entry_line" data-original-title="请先填写default线路解析">
+                             {% for line in lines %}
+                                 {% if line.name == 'default' %}
+                                    <option value="{{ line.pk }}" selected="selected">{{ line.name }}</option>
+                                 {% else %}
+                                     <option value="{{ line.pk }}">{{ line.name }}</option>
+                                 {% endif %}
+                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>记录值</label>
+                        <input type="text" class="form-control tooltips" id="entry_value" name="entry_value" data-original-title="A记录：填写您服务器 IP，CNAME记录：填写你需要指向的域名,MX记录：填写您邮件服务器的IP地址或邮箱域名，如果您不知道，请联系我们的运维工程师">
+                    </div>
+                    <div class="form-group">
+                        <label>权重</label>
+                        <input type="text" class="form-control tooltips" id="entry_weight" name="entry_weight" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>MX优先级</label>
+                        <input type="text" class="form-control tooltips" id="entry_mx" name="entry_mx" data-original-title="MX优先级，用来指定邮件服务器接收邮件的先后顺序（1-50），一般默认设置为5、10、15等,数字越小,级别越高">
+                    </div>
+                    <div class="form-group">
+                        <label>TTL</label>
+                        <input type="text" class="form-control tooltips" id="entry_ttl" value="600" name="entry_ttl" data-original-title="缓存的生存时间。指地方dns缓存您域名记录信息的时间，缓存失效后会再次来获取记录值">
+                    </div>
+                    <input type="hidden" id="domain_id" value="{{ domain_id }}">
+
+                </div>
+                <div align="conter" >
+                <p class="help-block"><font color="red" class="message"></font></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                        data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" id='record_submit' onclick="SubmitModal()">
+                        提交
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+<!--编辑域名记录-->
+<div class="modal fade" id="EditModal" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">编辑记录</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>主机记录</label>
+                    <input type="text" class="form-control tooltips" id="entry_name1" name="entry_name1" data-original-title="主机记录:NS-->>填@或者填gomeplus.com.,A-->填www或者填www.gomeplus.com.,MX-->填@或者填gomeplus.com.,CNAME-->填www或者填www.gomeplus.com.">
+                </div>
+                <div class="form-group">
+                    <label>记录类型</label>
+                    <select class="form-control" id="entry_type1" >
+                          {% for type in types %}
+                                 {% if type.name == 'A' %}
+                                    <option value="{{ type.pk }}" selected="selected">{{ type.name }}</option>
+                                 {% else %}
+                                 <option value="{{ type.pk }}">{{ type.name }}</option>
+                                 {% endif %}
+                          {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>线路类型</label>
+                     <select class="form-control tooltips" id="entry_line1" name="entry_line1" data-original-title="请先填写default线路解析" disabled>
+                         {% for line in lines %}
+                        <option value="{{ line.pk }}">{{ line.name }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group ">
+                    <label>记录值</label>
+                    <input type="text" class="form-control tooltips" id="entry_value1" name="entry_value1" data-original-title="A记录：填写您服务器 IP，CNAME记录：填写你需要指向的域名,MX记录：填写您邮件服务器的IP地址或邮箱域名，如果您不知道，请联系我们的运维工程师">
+                </div>
+                <div class="form-group">
+                    <label>权重</label>
+                    <input type="text" class="form-control" id="entry_weight1" name="entry_weight1">
+                </div>
+                <div class="form-group">
+                    <label>MX优先级</label>
+                    <input type="text" class="form-control tooltips" id="entry_mx1" name="entry_mx1" data-original-title="MX优先级，用来指定邮件服务器接收邮件的先后顺序（1-50），一般默认设置为5、10、15等,数字越小,级别越高">
+                </div>
+                <div class="form-group">
+                    <label>TTL</label>
+                    <input type="text" class="form-control tooltips" id="entry_ttl1" name="entry_ttl1" data-original-title="缓存的生存时间。指地方dns缓存您域名记录信息的时间，缓存失效后会再次来获取记录值">
+                </div>
+                <input type="hidden" id="record_id">
+            </div>
+
+            <div align="conter" class="message">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                    data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-primary" id='record_edit_submit' onclick="EditSubmit()">
+                    提交
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+{% endblock %}
+
+
+
+{% block self_footer_js %}
+
+
+
+<!--data table-->
+<script type="text/javascript" src="/static/js/data-tables/jquery.dataTables.js"></script>
+<script type="text/javascript" src="/static/js/data-tables/DT_bootstrap.js"></script>
+<script type="text/javascript" src="/static/js/jquery-validation-1.15.0/dist/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrapValidator.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap-dropdown.js"></script>
+
+
+<!--script for editable table-->
+<script src="/static/js/data-tables/editable-table.js"></script>
+<script src="/static/sweetalert/sweetalert.min.js"></script>
+
+<!-- END JAVASCRIPTS -->
+<script>
+
+//同步文件
+
+$('#sync_record').on('click',function(){
+    var sync = confirm('将同步所有线路下面的当前域名zone文件,确定要同步数据到配置文件吗?')
+    var domain_id = location.pathname.split('/')[3]
+    if (sync){
+        $.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'sync_record' %}',
+            data: {'domain_id':domain_id},
+            success: function(callback){
+                var callback = $.parseJSON(callback);
+                if(callback.status){
+                // 刷新当前页
+                    alert('同步成功')
+       //             window.location.href = window.location.href;
+                }else{
+        //            $('.message').html(callback.error)
+        //            $('#modal,#shade').addClass('hide');
+                    alert(callback.error)
+                }
+            }
+        })
+    }
+})
+/*
+添加记录
+ */
+
+function Prev(domain_name,region_name){
+    $.ajax({
+            type: 'GET',
+            url: "/dns/preview/" + domain_name +"/" + region_name,
+            success: function(callback){
+                var html = "<pre class='pre-scrollable'>" + callback + "</pre>"
+                swal({   title: "<small>预览</small>",   text: html,   html: true });
+            }
+        })
+}
+
+function AddRecord(){
+    $('#modal,#shade').removeClass('hide');
+
+}
+
+/*
+添加记录-->取消
+ */
+function CancleModal(){
+    $('#modal,#shade').addClass('hide');
+    $('#modal').find('input[type="text"]').val('');
+}
+
+
+/*
+添加内容-->提交
+ */
+
+function SubmitModal(){
+    // 获取对话框中的所有内容
+//          var modal_nid = $('#nid').val();
+    var domain_id = $('#domain_id').val();
+    var entry_name = $('#entry_name').val();
+    var entry_type = $('#entry_type').val();
+    var entry_line = $('#entry_line').val();
+    var entry_value = $('#entry_value').val();
+    var entry_mx = $('#entry_mx').val();
+    var entry_weight = $('#entry_weight').val();
+    var entry_ttl = $('#entry_ttl').val();
+    $.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+
+    $.ajax({
+        url: '{% url 'record_add' %}',
+        data:
+            {
+                'domain_id'  : domain_id,
+                'entry_name' : entry_name,
+                'entry_type' : entry_type,
+                'entry_value': entry_value,
+                'entry_line' : entry_line,
+                'entry_mx'   : entry_mx,
+                'entry_weight' : entry_weight,
+                'entry_ttl'  : entry_ttl
+            },
+        type: "POST",
+        success: function (callback) {
+            callback = $.parseJSON(callback);
+            if(callback.status){
+                // 刷新当前页
+                window.location.href = window.location.href;
+            }else{
+                $('.message').html(callback.error)
+                $('#modal,#shade').addClass('hide');
+            }
+        }
+    });
+}
+
+//delete
+function DelRecord(pid){
+    if(confirm("确认要删除吗？")){
+        $.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+        $.post("{% url 'record_del' %}", {"record_id": pid}, function(ret){
+            if (ret.status){
+                alert('删除成功')
+                window.location.reload()
+            }else{
+                alert(ret.error)
+            }
+        },'json');
+    }
+}
+
+
+//编辑
+function ChangeData(ths,nid){
+    var other = $(ths).parent().prevAll();
+    var entry_name = $(other[7]).text();
+    var entry_type = $(other[6]).attr('set-val');
+    var entry_line = $(other[5]).attr('set-val');
+    var entry_value = $(other[4]).text();
+    var entry_weight = $(other[3]).text();
+    var entry_mx = $(other[2]).text();
+    if (entry_weight === '-'){
+        var entry_weight = '';
+    }
+    if (entry_mx === '-'){
+        var entry_mx = '';
+    }
+    var entry_ttl = $(other[1]).text();
+
+    $('#record_id').val(nid);
+    $('#entry_name1').val(entry_name);
+    $('#entry_type1').val(entry_type);
+    $('#entry_line1').val(entry_line);
+    $('#entry_value1').val(entry_value);
+    $('#entry_weight1').val(entry_weight);
+    $('#entry_mx1').val(entry_mx);
+    $('#entry_ttl1').val(entry_ttl);
+}
+
+function EditSubmit(){
+        // 获取对话框中的所有内容
+
+    var entry_id = $('#record_id').val();
+    var entry_name = $('#entry_name1').val();
+    var entry_type = $('#entry_type1').val();
+    var entry_line = $('#entry_line1').val();
+    var entry_value = $('#entry_value1').val();
+    var entry_mx = $('#entry_mx1').val();
+    var entry_weight = $('#entry_weight1').val();
+    var entry_ttl = $('#entry_ttl1').val();
+    $.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+    $.ajax({
+        url: '{% url 'record_edit' %}',
+        data:
+            {
+                'entry_id'   : entry_id,
+                'entry_name' : entry_name,
+                'entry_type' : entry_type,
+                'entry_value': entry_value,
+                'entry_line' : entry_line,
+                'entry_mx'   : entry_mx,
+                'entry_weight' : entry_weight,
+                'entry_ttl'  : entry_ttl
+            },
+        type: "POST",
+        success: function (callback) {
+            callback = $.parseJSON(callback);
+            if(callback.status){
+                // 刷新当前页
+                window.location.href = window.location.href;
+            }else{
+                $('.message').html(callback.error)
+                $('#modal,#shade').addClass('hide');
+            }
+        }
+    });
+}
+
+
+ jQuery(document).ready(function() {
+        EditableTable.init();
+        $('#myModal').bootstrapValidator({
+    　　　　　   message: 'This value is not valid', //默认错误消息
+                feedbackIcons: {//输入框不同状态，显示图片的样式
+                        valid: 'fa fa-check',
+                        invalid: 'fa fa-times',
+                        validating: 'fa fa-refresh'
+                },
+                submitButtons: 'button[id="record_submit"]',//绑定提交按钮,当input值不正确时后,禁用提交按钮
+                fields: {
+                    entry_name: {//键名entry_name和input name='entry_name'值对应
+                        validators: {
+                            notEmpty: {
+                                message: '请输入主机记录'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 63,
+                                message: '主机记录长度在1-63之间'
+                            }
+                        }
+                    },
+                    entry_value: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入记录值'
+                            },
+                            callback:{
+                                message: '记录值不正确,请检查记录类型',
+                                callback: function(value, validator){
+                                    var entry_type = $("#entry_type").find("option:selected").text();
+                                    if (entry_type === 'NS'){
+                                        var reg = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}\.?$/;
+                                        return reg.test(value);
+                                    } else if(entry_type === 'A'){
+                                        var reg =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+                                        return reg.test(value);
+                                    }else if(entry_type === 'CNAME') {
+                                        var reg = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}\.?$/;
+                                        return reg.test(value);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    entry_weight: {
+                        validators: {
+                            integer: {
+                                message: '权限值只能是数字'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z0-9_\.]+$/,
+                                message: '只能是数字和字母_.'
+                        },
+                        }
+                    },
+                    entry_mx: {
+                        validators: {
+                            between: {
+                                min: 0,
+                                max: 99,
+                                message: "mx记录在0-99,数字越小，级别越高"
+                            }
+                        }
+                    },
+                    entry_ttl: {
+                        validators: {
+                            notEmpty:{
+                                message:'请输入TTL值'
+                            },
+                            integer: {
+                                message: 'TTL只能为数字'
+                            }
+                        }
+                    }
+                }
+    });
+        $('#EditModal').bootstrapValidator({
+    　　　　　   message: 'This value is not valid', //默认错误消息
+                feedbackIcons: {//输入框不同状态，显示图片的样式
+                        valid: 'fa fa-check',
+                        invalid: 'fa fa-times',
+                        validating: 'fa fa-refresh'
+                },
+                submitButtons: 'button[id="record_submit"]',//绑定提交按钮,当input值不正确时后,禁用提交按钮
+                fields: {
+                    entry_name1: {//键名entry_name和input name='entry_name'值对应
+                        validators: {
+                            notEmpty: {
+                                message: '请输入主机记录'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 63,
+                                message: '主机记录长度在1-63之间'
+                            }
+                        }
+                    },
+                    entry_value1: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入记录值'
+                            },
+                            callback:{
+                                message: '记录值不正确,请检查记录类型',
+                                callback: function(value, validator){
+                                    var entry_type = $("#entry_type1").find("option:selected").text();
+                                    if (entry_type === 'NS'){
+                                        var reg = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}\.?$/;
+                                        return reg.test(value);
+                                    } else if(entry_type === 'A'){
+                                        var reg =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+                                        return reg.test(value);
+                                    }else if(entry_type === 'CNAME') {
+                                        var reg = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}\.?$/;
+                                        return reg.test(value);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    entry_weight1: {
+                        validators: {
+                            integer: {
+                                message: '权限值只能是数字'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z0-9_\.]+$/,
+                                message: '只能是数字和字母_.'
+                        },
+                        }
+                    },
+                    entry_mx1: {
+                        validators: {
+                            between: {
+                                min: 0,
+                                max: 99,
+                                message: "mx记录在0-99,数字越小，级别越高"
+                            }
+                        }
+                    },
+                    entry_ttl1: {
+                        validators: {
+                            notEmpty:{
+                                message:'请输入TTL值'
+                            },
+                            integer: {
+                                message: 'TTL只能为数字'
+                            }
+                        }
+                    }
+                }
+    });
+});
+//行编辑;
+EntryType = [
+    {'id':1,value:'A'},
+    {'id':2,value:'CNAME'},
+    {'id':3,value:'NS'},
+    {'id':4,value:'AAAA'},
+    {'id':5,value:'显性URL'},
+    {'id':5,value:'隐形URL'}
+]
+EntryLine = [
+    {'id':1,value:'默认'},
+    {'id':2,value:'四川'}
+]
+var htmlInfo = {} //根据record_id来记录每个tr编辑前的html内容;
+    function EditRow(arg){
+        //获取当前行标签上面所有数据;
+        //循环所有标签,看哪些行能够编辑
+        var recordId = $(arg).parent().prevAll().find(':checkbox').parent().attr('value');
+        if (htmlInfo.hasOwnProperty(recordId)){
+        }else {
+            htmlInfo[recordId] = $('.edit').parent().parent().html();
+        }
+
+        console.log(htmlInfo)
+        if ($(arg).hasClass('editing')){
+            //取消编辑状态;
+             $(arg).text('编辑')
+            $(arg).parent().parent().html(htmlInfo[recordId])
+            $(arg).removeClass('editing');
+
+        }else{
+            $(arg).addClass('editing');
+             $(arg).text('取消');
+            var items = $(arg).parent().prevAll();
+            items.each(function(){
+                var td = $(this);
+                if (td.attr('edit') == 'true'){
+                    //如果可编辑,则进入编辑模式;
+
+                    if (td.attr('edit_type') =='select'){
+                        //如果标签是select;
+                        var temp = "<select type='entry-type'><option value='1'>A</option><option value='2'>CNAME</option></select>";
+                        td.html(temp)
+                    }else {
+                        var text = td.text();
+                        var temp = "<input type='text' value='" + text + "'/>";
+                        td.html(temp);
+                    }
+                }
+            })
+        }
+    }
+//Save
+function SaveTable(ths){
+    //1.判断是否处于编辑模式
+    //编辑模式:获取input的值
+    //非编辑模式,直接获取text值
+    var recordId = $(ths).parent().prevAll().find(':checkbox').parent().attr('value');
+    var data = {};
+    var isEditing = $(ths).siblings().eq(0).hasClass('editing')
+    if (isEditing){
+        //编辑状态中,获取input和select的值;
+        var item = $(ths).parent().prevAll();
+        item.each(function(){
+            var td = $(this);
+            if (td.attr('edit') == 'true'){
+                if (td.attr('edit_type') == 'select') {
+                    //获取select值
+                    var select_value = item.parent().prevAll().find("select[type='entry-type']").val();
+                    var select_text = (function(info){
+                        //获取select对应的值
+                        for (var item of info){
+                            if (item['id'] == select_value){
+                                var result = item['value']
+                                return result
+                            }
+                        }
+                    })(EntryType);
+                    data[td.attr('name')]=select_value;
+                    td.html(select_text);
+                    alert(td.text())
+                    alert(td.html())
+
+                }else{
+                //获取input值
+
+                     var inp = td.children(':first');
+                     var input_value = inp.val();
+                     console.log(td.text())
+                     alert(td.text())
+                     td.text(input_value);
+
+
+
+                }
+            }
+        })
+
+    }else{
+        var tr = $(ths).parent().prevAll();
+        tr.each(function(){
+        var td = $(this);
+        if (td.attr('edit') == 'true'){
+            data[td.attr('name')]=td.text();
+        }
+    })
+    console.log(data)
+}
+}
+
+</script>
+{% endblock %}
+
+
+
+
+
+

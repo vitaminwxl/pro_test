@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>登录| Nurse</title>
+	{% include 'link_css.html' %}
+    
+</head>
+
+<body class="login-body">
+
+<div class="container">
+
+    <form class="form-signin" method="post" action=""> {% csrf_token %}
+        <div class="form-signin-heading text-center">
+            <h1 class="sign-title">DNS管理系统</h1>
+            <a>Login</a>
+        </div>
+        <div class="login-wrap">
+            <input type="text" class="form-control" name="username" placeholder="Username" autofocus>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+
+            <button class="btn btn-lg btn-login btn-block" type="submit">
+                <i class="fa fa-check"></i>
+            </button>
+			<font color="red">{{error}}</font>
+        </div>
+
+    </form>
+
+</div>
+
+{% include 'footer.html' %}
+
+
+</body>
+{%  include 'foot_script.html'%}
+</html>

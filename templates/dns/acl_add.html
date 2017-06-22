@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block self_head_css_js %}
+  <title>用户管理</title>
+
+  <!--data table-->
+  <link rel="stylesheet" href="/static/js/data-tables/DT_bootstrap.css" />
+    <style>
+    .td{word-wrap:break-word;word-break:break-all;table-layout：fixed}
+    </style>
+{% endblock %}
+
+{% block  content %}
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="{% url 'acl_list' %}">ACL管理</a>
+                </li>
+                <li>
+                    <a href="">添加ACL</a>
+                </li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                <section class="panel">
+                <header class="panel-heading">
+                    添加ACL
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">ACL名称</label>
+                            <input type="text" class="form-control" id="acl" placeholder="Enter email">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">IP地址段</label>
+                            <textarea rows="6" id='address' class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                        <label for="exampleInputEmail1">View</label>
+                        <div class="form-group">
+                            <select class="form-control m-bot15">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                        </div>
+                    </div>
+                        <button type="submit" class="btn btn-primary" onclick="Save("#acl","#address")">Submit</button>
+                    </form>
+
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!--body wrapper end-->
+{% endblock %}
+
+{% block self_footer_js %}
+<script>
+function Save(acl,address){
+    var acl_value = $(acl).text();
+    var address_value = $(address).text();
+    var address_array = address_value.split(';')
+    address_array.each(function(){
+        var ip = $(this).split('/')[0];
+        var netmask = $(this).split('/')[1];
+        if  (0<netmask.length<32 && ValidIp(ip) ){
+        }else {
+            alert("ip地址有误 ["+ ip +"]")
+        }
+        data = {}
+    AjaxPost()
+    })
+
+}
+function ValidIp(){
+    return true;
+}
+$.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}' }});
+function AjaxPost(data){
+    var data = toJSON(data)
+    $.post('{% url "acl_add" %}',data,function(result){
+        data = parseJSON(result)
+        if (result.status){
+            alert('添加成功')
+        }else{
+            alert(result.error)
+        }
+    },'json')
+}
+
+</script>
+
+{% endblock %}

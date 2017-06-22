@@ -1,0 +1,19 @@
+<ul class="nav nav-pills nav-stacked custom-nav">
+	<li><a href="/"><i></i> <span></span></a></li>
+	<li><a href="/"><i class="fa fa-home"></i> <span>首页</span></a></li>
+	<li id='dns' class="menu-list"><a href="#"><i class="fa fa-sun-o"></i> <span>域名管理</span></a>
+        <ul class="sub-menu-list">
+			<li class="domain_show"><a href='{% url 'domain_show' %}'> 二级域名</a></li>
+{#            <li class="resolve"><a href='{% url 'resolve' %}'> 记录管理</a></li>#}
+            <li class="view"><a href='{% url 'view_show' %}'> 线路管理</a></li>
+			<li class="acl_list"><a href="{% url 'acl_list' %}"> acl管理</a></li>
+		</ul>
+    </li>
+    <li><a href="#"><i class="fa fa-book"></i> <span>日志管理</span></a></li>
+	<li id='user' class="menu-list"><a><i class="fa fa-user"></i> <span>用户管理</span></a>
+		<ul class="sub-menu-list">
+			<li class="user_list"><a href='{% url 'user_list' %}'> 用户管理</a></li>
+			<li class=""><a href="#"> 权限管理</a></li>
+		</ul>
+	</li>
+</ul>

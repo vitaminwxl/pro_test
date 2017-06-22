@@ -1,0 +1,160 @@
+{% extends 'base.html'%}
+{% block self_head_css_js %}
+{% endblock %}
+
+{% block content %}
+<!-- page heading start-->
+<div class="page-heading">
+	<h3>
+	添加域名
+	</h3>
+	<ul class="breadcrumb">
+		<li>
+			<a href="/">首页</a>
+		</li>
+		<li>
+			<a href="/dns/domain_show">域名管理</a>
+		</li>
+		<li class="active"> 添加域名 </li>
+	</ul>
+</div>
+<!-- page heading end-->
+
+<!--body wrapper start-->
+<div class="wrapper">
+	<div class="row">
+		<div class="col-sm-12">
+		<section class="panel">
+		<header class="panel-heading">
+			添加域名
+			<span class="tools pull-right">
+				<a href="javascript:;" class="fa fa-chevron-down"></a>
+				<a href="javascript:;" class="fa fa-times"></a>
+			</span>
+		</header>
+		<div class="panel-body" id="ymtj">
+			<form action="{% url 'domain_add' %}" method="post" role="form" class="form-horizontal adminex-form">{% csrf_token %}
+				<div class="form-group has-success">
+					<label class="col-lg-2 control-label">域名</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="请输入主域名，如meixin.com" data-placement="top" data-toggle="tooltip" placeholder="" id="domain_name" name='domain_name' class="form-control tooltips">
+						<p class="help-block"><font color="red">{{error}}</font></p>
+					</div>
+				</div>
+                <div class="form-group has-error">
+					<label class="col-lg-2 col-sm-2 control-label">主机名</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="Master DNS的主机名" data-placement="top" data-toggle="tooltip" value="ns1.gomeplus.com." onchange="CheckChange(this.id)" id="hostname" name='hostname' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">管理员Email</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="root.localhost" data-placement="top" data-toggle="tooltip" value="root.gomeplus.com." id="M_email" name='M_email' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">Serial</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="该序号作为slave与master更新的依据，一般利用日期来设定" data-placement="top" value='2016082301' data-toggle="tooltip"  id="serial" name='serial' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">Refresh</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="命令slave多久进行一次主动更新" data-placement="top" data-toggle="tooltip" value="604800" id="refresh" name='refresh' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">Retry</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="如果到了refresh的时间，但是slave无法连接master时，那么多久之后slave会再次主动尝试与主机连线" value='3600' data-placement="top" data-toggle="tooltip" value="retry" id="retry" name='retry' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">Expire</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="如果slave一直无法与master连接上，那么经过多久的时间后，则命令slave不要在连接master了" data-placement="top" data-toggle="tooltip" value="7200" id="expire" name='expire' class="form-control tooltips">
+					</div>
+					<label class="col-lg-2 col-sm-2 control-label">TTL</label>
+					<div class="col-lg-10">
+						<input type="text" data-trigger="hover" data-original-title="TTL" data-placement="top" data-toggle="tooltip" value="86400" id="ttl" name='ttl' class="form-control tooltips">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-10">
+						<button class="btn btn-primary" type="submit" onclick="checkdomain();">Submit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
+
+	</div>
+	</div>
+	</div>
+
+
+{% endblock %}
+
+{% block self_footer_js %}
+<!--data table-->
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  $("#domain_name").change(function(){
+      var value = $(this).val();
+      $('#hostname').val('ns1.'+value+'.');
+      $('#M_email').val('admin.'+value+'.');
+  });
+});
+
+
+function checkdomain()
+{
+
+	var domain_name = $('#domain_name').val();
+	var hostname = $('#hostname').val();
+	var M_email = $('#M_email').val();
+	var serial = $('#serial').val();
+	var refresh = $('#refresh').val();
+	var retry = $('#retry').val();
+	var expire = $('#expire').val();
+	var ttl = $('#ttl').val();
+	var reg =/^[0-9a-zA-Z]+[0-9a-zA-Z\.-]*\.[a-zA-Z]{2,4}$/;
+	var r = domain_name.match(reg);
+	if (domain_name.length == 0)
+		{
+			alert('域名不能为空');
+		}
+	else if (hostname.length == 0)
+		{
+			alert('主机名不能为空');
+		}
+	else if (M_email.length == 0)
+		{
+			alert('管理员Email不能为空');
+		}
+	else if (serial.length == 0)
+		{
+			alert('Serial不能为空');
+		}
+	else if (refresh.length == 0)
+		{
+			alert('Refresh不能为空');
+		}
+	else if (retry.length == 0)
+		{
+			alert('Retry不能为空');
+		}
+	else if (expire.length == 0)
+		{
+			alert('Expire不能为空');
+		}
+	else if (ttl.length == 0)
+		{
+			alert('TTL不能为空');
+		}
+	else if (r == null)
+		{
+			alert('错误的域名格式，请重新输入');
+		}
+
+}   
+</script>
+
+
+
+
+{% endblock %}

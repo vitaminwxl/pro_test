@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block self_head_css_js %}
+  <title>用户管理</title>
+
+  <!--data table-->
+  <link rel="stylesheet" href="/static/js/data-tables/DT_bootstrap.css" />
+    <style>
+    .td{word-wrap:break-word;word-break:break-all;table-layout：fixed}
+    </style>
+{% endblock %}
+
+{% block  content %}
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <h3>
+                域名管理
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/">首页</a>
+                </li>
+                <li>
+                    <a href="/dns/domain_show">域名管理</a>
+                </li>
+                <li class="active"> ACL管理 </li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                <section class="panel">
+                <header class="panel-heading">
+                    ACL 管理
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                     <div class="adv-table editable-table ">
+                        <div class="clearfix">
+                            <div class="btn-group">
+                                <button id="editable-sample_new" class="btn btn-primary" onclick="AddRecord();">
+                                    <a href="{% url 'acl_add' %}">添加acl <i class="fa fa-plus"></i></a>
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button id="editable-sample_new" class="btn btn-warning" onclick="AddRecord();">
+                                    同步文件 <i class="fa "></i>
+                                </button>
+                            </div>
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a href="#">Print</a></li>
+                                    <li><a href="#">Save as PDF</a></li>
+                                    <li><a href="#">Export to Excel</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                         <div class="space15" style="padding: 20px 20px"></div>
+                         <table class="table table-striped table-hover table-bordered" id="editable-sample" >
+                            <thead>
+                                <tr>
+                                    <th class="text-center" nowrap="nowrap">选择</th>
+                                    <th class="text-center">线路</th>
+                                    <th class="text-center">region</th>
+                                    <th class="text-center">client</th>
+                                    <th class="text-center">操作</th>
+                                </tr>
+                            </thead>
+                             <tbody >
+                                {% for acl_obj in acl_objs %}
+                                    <tr>
+                                        <td class="text-center" >
+                                            <input value="{{ acl_obj.id }}" type="checkbox"/>
+                                        </td>
+                                        <td class="text-center" edit="true" edit-mode='select'style="width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">{{ acl_obj.View.view_name }}</td>
+                                        <td class="text-center td" edit='true' ">{{ acl_obj.region }}</td>
+                                        <td class="text-center td" edit='true' edit-mode="textarea">
+                                            {{ acl_obj.client }}
+                                        </td>
+                                         <td class="text-center" style="width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+                                            <a id='record-id' type="button" class="delete btn btn-danger" onclick="CheckEdit(this)">编辑</a>
+                                            <a id='record-id' type="button" class="preview btn btn-warning">删除</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="checkbox" value="1">
+                                    </td>
+                                    <td class="text-center" style="width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">CT-EF</td>
+                                    <td class="text-center td">CT-EF</td>
+                                    <td class="text-center td">
+                                        114.110.64.0/18;123.172.0.0/15;124.234.0.0/15;175.30.0.0/15;202.97.38.0/24;219.149.192.0/20;219.149.208.0/21;219.149.216.0/22;219.149.220.0/23;219.149.224.0/19;219.150.0.0/19;222.126.190.0/24;222.168.0.0/15;
+                                    </td>
+                                     <td class="text-center" style="width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+                                        <a id='record-id' type="button" class="delete btn btn-danger">编辑</a>
+                                        <a id='record-id' type="button" class="preview btn btn-warning">删除</a>
+                                    </td>
+                                </tr>
+                             </tbody>
+
+                         </table>
+                </div>
+                </section>
+                </div>t
+            </div>
+        </div>
+
+        <!--body wrapper end-->
+{% endblock %}
+
+{% block self_footer_js %}
+
+<!-- END JAVASCRIPTS -->
+
+<script>
+{#    jQuery(document).ready(function() {#}
+{#        console.log(VIEW_HASH)#}
+{#        EditableTable.init();#}
+{#    });#}
+VIEW_HASH={};
+{% for view_obj in view_objs %}
+
+    VIEW_HASH['{{ view_obj.view_name }}'] = {{ view_obj.id }}
+{% endfor %}
+
+function CheckEdit(thi) {
+    //获取所有内容
+    //替换成input标签和select标签
+    $(thi).parent().siblings().each(function () {
+        var td = $(this);
+        //判断是否可编辑
+        if (td.attr('edit') === 'true') {
+            var text = td.text();
+            //判断标签类型
+            if (td.attr('edit-mode') === 'textarea') {
+                alert(td.text())
+                var temp = "<textarea cols='30' rows='5'>"+ text+"</textarea>"
+                td.html(temp)
+            } else {
+                var temp = "<input type='text' value='" + text + "'/>";
+                td.html(temp)
+            }
+        }
+    })
+}
+
+function CheckSave(thi){
+
+}
+function CheckDel(thi){
+    //
+}
+
+function CheckCancel(thi){
+
+}
+</script>
+
+{% endblock %}

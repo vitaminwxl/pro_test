@@ -1,0 +1,145 @@
+{% extends 'base.html'%}
+{% block self_head_css_js %}
+{% endblock %}
+
+{% block content %}
+<!-- page heading start-->
+<div class="page-heading text-center">
+	<h1>
+		欢迎使用NURSE系统
+	</h1>
+</div>
+<!-- page heading end-->
+
+<!--body wrapper start-->
+<div class="wrapper">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel">
+						<div class="panel-body">
+							<div class="profile-pic text-center">
+								<img alt="" src="static/image/touxiang.jpg">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="panel">
+						<div class="panel-body">
+							<ul class="p-info">
+								<li>
+									<div class="title">用户名</div>
+									<div class="desk">{{ request.user.username }}</div>
+								</li>
+								<li>
+									<div class="title">所在用户组</div>
+									<div class="desk">devops</div>
+								</li>
+								<li>
+									<div class="title">权限</div>
+									<div class="desk">普通用户</div>
+								</li>
+								<li>
+									<div class="title">添加日期</div>
+									<div class="desk">{{ request.user.date_joined|date:"Y-m-d H:i:s" }}</div>
+								</li>
+								<li>
+									<div class="title">上次登录</div>
+									<div class="desk">{{ request.user.last_login |date:"Y-m-d H:i:s" }}</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-8">
+			<div class="row">
+				<div class="col-md-5" style="float:left">
+				<div class="row">
+				<a href="/dns/domain_show">
+					<div class="panel">
+						<div class="panel-body p-states green-box">
+							<div class="summary pull-left">
+								<h4> 所拥有域名</h4>
+								<h3> 9 个</h3>
+							</div>
+							<div id="expense" class="chart-bar"></div>
+						</div>
+					</div>
+				</a>
+				</div>
+			</div>
+			<div class="col-md-5" style="float:right;margin-right:45px">
+				<div class="row">
+				<a href="/dns/view/show">
+					<div class="panel">
+						<div class="panel-body p-states green-box">
+							<div class="summary pull-left">
+								<h4>线路 <span>总数</span></h4>
+								<h3>3</h3>
+							</div>
+							<div id="pro-refund" class="chart-bar"></div>
+						</div>
+					</div>
+				</a>
+				</div>
+			</div>
+			<!--/div>
+		</div>
+		<div class="col-md-8"-->
+			<!--div class="row">
+				<div class="col-md-12">
+					<div class="panel">
+						<div class="panel-body">
+							<div class="profile-desk">
+								<h1>注意事项</h1>
+								<p>
+									使用的时候一定要美美哒
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div-->
+			<div class="row" style="margin-right:30px">
+				<div class="col-md-12">
+					<div class="panel">
+						<header class="panel-heading">
+							操作记录
+							<span class="tools pull-right">
+								<a class="fa fa-chevron-down" href="javascript:;"></a>
+								<a class="fa fa-times" href="javascript:;"></a>
+							</span>
+						</header>
+						<div class="panel-body">
+							<ul class="activity-list">
+	
+						
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+	</div>
+	
+	<!--body wrapper end-->
+
+
+
+{% endblock %}
+
+{% block self_footer_js %}
+<!--data table-->
+
+
+
+
+
+{% endblock %}
